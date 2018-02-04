@@ -33,6 +33,7 @@
 (defun nix-update-fetch ()
   (interactive)
   (save-excursion
+    (goto-char (point-min))
     (when (re-search-forward
            (rx (and (submatch
                      (or "compileEmacsWikiFile"
