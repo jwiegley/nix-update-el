@@ -118,7 +118,7 @@
                             (shell-command
                              (format (concat
                                       "nix-prefetch-git --no-deepClone"
-                                      " --quiet %s %s")
+                                      " --quiet '%s' %s")
                                      url "refs/heads/master")
                              (current-buffer))
                             (message "Fetching Git URL: %s ...done" url))
@@ -129,7 +129,7 @@
                         (with-temp-buffer
                           (message "Fetching URL %s: ..." url)
                           (let ((inhibit-redisplay t))
-                            (shell-command (format "nix-prefetch-url %s" url)
+                            (shell-command (format "nix-prefetch-url '%s'" url)
                                            (current-buffer))
                             (message "Fetching URL %s: ...done" url))
                           (goto-char (point-min))
@@ -149,7 +149,7 @@
                           (let ((inhibit-redisplay t))
                             (shell-command
                              (format
-                              "nix-prefetch-url https://www.emacswiki.org/emacs/download/%s" name)
+                              "nix-prefetch-url 'https://www.emacswiki.org/emacs/download/%s'" name)
                              (current-buffer))
                             (message "Fetching EmacsWiki file %s: ...done" name))
                           (goto-char (point-min))
