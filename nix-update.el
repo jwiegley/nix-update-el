@@ -33,6 +33,7 @@
 (defun nix-update-fetch ()
   (interactive)
   (save-excursion
+    (goto-char (point-min))
     (when (re-search-forward
            (rx (and (submatch
                      (or "compileEmacsWikiFile"
@@ -53,7 +54,9 @@
                      (field)
                      (goto-char (point-min))
                      (when (re-search-forward
-                            (concat field "\\s-+=\\s-+\"?\\(.+?\\)\"?\\s-*;"))
+                            (concat field "\\s-+=\\s-+\"?\\(.+?\\)\"?\\s-*;")
+                            nil
+                            t)
                        (match-string 1)))
                     (set-field
                      (field value)
@@ -74,7 +77,10 @@
                    (pcase type
                      (`"fetchFromGitHub"
                       (let ((owner (get-field "owner"))
-                            (repo (get-field "repo")))
+                            (repo (get-field "repo"))
+                            (submodules
+                             (let ((subs (get-field "fetchSubmodules")))
+                               (and subs (string-equal subs "true")))))
                         (with-temp-buffer
                           (message "Fetching GitHub repository: %s/%s ..."
                                    owner repo)
@@ -83,6 +89,7 @@
                              (format
                               (concat
                                "nix-prefetch-git --no-deepClone"
+                               (if submodules " --fetch-submodules" "")
                                " --quiet git://github.com/%s/%s.git %s")
                               owner repo "refs/heads/master")
                              (current-buffer))
