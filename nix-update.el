@@ -1,12 +1,14 @@
-;;; nix-update --- Update "fetch" blocks in .nix expressions
+;;; nix-update.el --- Update "fetch" blocks in .nix expressions
 
 ;; Copyright (C) 2018 John Wiegley
 
 ;; Author: John Wiegley <johnw@newartisans.com>
+;; Maintainer: John Wiegley <johnw@newartisans.com>
 ;; Created: 1 Feb 2018
 ;; Version: 1.0
+;; Package-Requires: ((emacs "25"))
 ;; Keywords: nix
-;; X-URL: https://github.com/jwiegley/nix-update-el
+;; URL: https://github.com/jwiegley/nix-update-el
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -28,9 +30,12 @@
 ;; Bind nix-update-fetch to a key (I use `C-. u'), and then you can very
 ;; easily update the rev/sha of a fetchgit declaration.
 
+;;; Code:
+
 (require 'rx)
 
 (defun nix-update-fetch ()
+  "Update the nix fetch expression at point."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -180,3 +185,5 @@
               (set-field "sha256" (alist-get 'sha256 data)))))))))
 
 (provide 'nix-update)
+
+;;; nix-update.el ends here
