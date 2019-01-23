@@ -145,7 +145,7 @@
                                            (current-buffer))
                             (message "Fetching URL %s: ...done" url))
                           (goto-char (point-min))
-                          (when (looking-at "^path is")
+                          (while (looking-at "^\\(path is\\|warning\\)")
                             (forward-line))
                           (list
                            (cons 'date
@@ -165,7 +165,7 @@
                              (current-buffer))
                             (message "Fetching EmacsWiki file %s: ...done" name))
                           (goto-char (point-min))
-                          (when (looking-at "^path is")
+                          (while (looking-at "^\\(path is\\|warning\\)")
                             (forward-line))
                           (list
                            (cons 'date
