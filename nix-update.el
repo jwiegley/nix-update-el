@@ -38,7 +38,6 @@
   "Update the nix fetch expression at point."
   (interactive)
   (save-excursion
-    (goto-char (point-min))
     (when (re-search-forward
            (rx (and (submatch
                      (or "compileEmacsWikiFile"
