@@ -44,6 +44,7 @@
                          (and "fetch"
                               (or "url"
                                   "git"
+                                  "zip"
                                   (and "FromGit" (or "Hub" "Lab"))))))
                     (1+ space)
                     "{"))
@@ -141,6 +142,24 @@
                           (message "Fetching URL %s: ..." url)
                           (let ((inhibit-redisplay t))
                             (shell-command (format "nix-prefetch-url '%s'" url)
+                                           (current-buffer))
+                            (message "Fetching URL %s: ...done" url))
+                          (goto-char (point-min))
+                          (while (looking-at "^\\(path is\\|warning\\)")
+                            (forward-line))
+                          (list
+                           (cons 'date
+                                 (format-time-string "%Y-%m-%dT%H:%M:%S%z"))
+                           (cons 'sha256
+                                 (buffer-substring
+                                  (line-beginning-position)
+                                  (line-end-position)))))))
+                     (`"fetchzip"
+                      (let ((url (get-field "url")))
+                        (with-temp-buffer
+                          (message "Fetching URL %s: ..." url)
+                          (let ((inhibit-redisplay t))
+                            (shell-command (format "nix-prefetch-url --unpack '%s'" url)
                                            (current-buffer))
                             (message "Fetching URL %s: ...done" url))
                           (goto-char (point-min))
