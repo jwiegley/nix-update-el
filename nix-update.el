@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'rx)
+(require 'json)
 
 (defun nix-update-fetch ()
   "Update the nix fetch expression at point."
