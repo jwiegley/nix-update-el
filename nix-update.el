@@ -83,7 +83,7 @@
                      (`"fetchFromGitHub"
                       (let ((owner (get-field "owner"))
                             (repo (get-field "repo"))
-                            (rev (or (get-field "rev") "refs/heads/master"))
+                            (rev (or (get-field "rev") ""))
                             (submodules
                              (let ((subs (get-field "fetchSubmodules")))
                                (and subs (string-equal subs "true")))))
@@ -107,7 +107,7 @@
                      (`"fetchFromGitLab"
                       (let ((owner (get-field "owner"))
                             (repo (get-field "repo"))
-                            (rev (or (get-field "rev") "refs/heads/master")))
+                            (rev (or (get-field "rev") "")))
                         (with-temp-buffer
                           (message "Fetching GitLab repository: %s/%s ..."
                                    owner repo)
@@ -126,7 +126,7 @@
                           (json-read-object))))
                      (`"fetchgit"
                       (let ((url (get-field "url"))
-                            (rev (or (get-field "rev") "refs/heads/master")))
+                            (rev (or (get-field "rev") "")))
                         (with-temp-buffer
                           (message "Fetching Git URL: %s ..." url)
                           (let ((inhibit-redisplay t))
