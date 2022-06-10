@@ -34,6 +34,7 @@
 
 (require 'rx)
 
+;;;###autoload
 (defun nix-update-fetch ()
   "Update the nix fetch expression at point."
   (interactive)
