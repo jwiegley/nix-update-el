@@ -94,7 +94,7 @@
                               (concat
                                "nix-prefetch-git --no-deepClone"
                                (if submodules " --fetch-submodules" "")
-                               " --quiet git://github.com/%s/%s.git %s")
+                               " --quiet https://github.com/%s/%s.git %s")
                               owner repo "refs/heads/master")
                              (current-buffer))
                             (message
