@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'rx)
+(require 'json)
 
 ;;;###autoload
 (defun nix-update-fetch ()
@@ -77,12 +78,13 @@
                          (when (looking-at "^\\(\\s-+\\)")
                            (setq leader (match-string 1)))
                          (goto-char (line-end-position))
-                         (insert ?\n leader field " = " value ";")))))
+                         (insert ?\n leader field " = \"" value "\";")))))
             (let ((data
                    (pcase type
                      (`"fetchFromGitHub"
                       (let ((owner (get-field "owner"))
                             (repo (get-field "repo"))
+                            (rev (or (get-field "rev") ""))
                             (submodules
                              (let ((subs (get-field "fetchSubmodules")))
                                (and subs (string-equal subs "true")))))
@@ -95,17 +97,18 @@
                               (concat
                                "nix-prefetch-git --no-deepClone"
                                (if submodules " --fetch-submodules" "")
-                               " --quiet https://github.com/%s/%s.git")
-                              owner repo)
+                               " --quiet https://github.com/%s/%s.git %s")
+                              owner repo rev)
                              (current-buffer))
                             (message
-                             "Fetching GitHub repository: %s/%s ...done"
-                             owner repo))
+                             "Fetching GitHub repository: %s/%s:%s ...done"
+                             owner repo rev))
                           (goto-char (point-min))
                           (json-read-object))))
                      (`"fetchFromGitLab"
                       (let ((owner (get-field "owner"))
-                            (repo (get-field "repo")))
+                            (repo (get-field "repo"))
+                            (rev (or (get-field "rev") "")))
                         (with-temp-buffer
                           (message "Fetching GitLab repository: %s/%s ..."
                                    owner repo)
@@ -115,7 +118,7 @@
                               (concat
                                "nix-prefetch-git --no-deepClone"
                                " --quiet https://gitlab.com/%s/%s.git %s")
-                              owner repo "refs/heads/master")
+                              owner repo rev)
                              (current-buffer))
                             (message
                              "Fetching GitLab repository: %s/%s ...done"
@@ -123,7 +126,8 @@
                           (goto-char (point-min))
                           (json-read-object))))
                      (`"fetchgit"
-                      (let ((url (get-field "url")))
+                      (let ((url (get-field "url"))
+                            (rev (or (get-field "rev") "")))
                         (with-temp-buffer
                           (message "Fetching Git URL: %s ..." url)
                           (let ((inhibit-redisplay t))
@@ -131,7 +135,7 @@
                              (format (concat
                                       "nix-prefetch-git --no-deepClone"
                                       " --quiet '%s' %s")
-                                     url "refs/heads/master")
+                                     url rev)
                              (current-buffer))
                             (message "Fetching Git URL: %s ...done" url))
                           (goto-char (point-min))
@@ -176,13 +180,15 @@
                                   (line-end-position))))))))))
               (if (assq 'rev data)
                   (set-field "rev" (alist-get 'rev data)))
+              (set-field "sha256" (alist-get 'sha256 data))
               (if (assq 'date data)
                   (set-field "# date"
                              (let ((date (alist-get 'date data)))
                                (if (string-match "\\`\"\\(.+\\)\"\\'" date)
                                    (match-string 1 date)
-                                 date))))
-              (set-field "sha256" (alist-get 'sha256 data)))))))))
+                                 date)))))))))))
+
+
 
 (provide 'nix-update)
 
