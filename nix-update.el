@@ -46,6 +46,7 @@
                          (and "fetch"
                               (or "url"
                                   "git"
+                                  "Pypi"
                                   "zip"
                                   (and "FromGit" (or "Hub" "Lab"))))))
                     (1+ space)
@@ -60,11 +61,22 @@
           (cl-flet ((get-field
                      (field)
                      (goto-char (point-min))
-                     (when (re-search-forward
-                            (concat field "\\s-+=\\s-+\"?\\(.+?\\)\"?\\s-*;")
-                            nil
-                            t)
-                       (match-string 1)))
+                     (let ((field-re (concat field "\\s-+=\\s-+\"?\\(.+?\\)\"?\\s-*;"))
+                           (res))
+                       (cond
+                        ((re-search-forward field-re nil t)
+                         (match-string 1))
+                        ((and (re-search-forward
+                               (concat "inherit\\s-+.*" field ".*;")
+                               nil
+                               t)
+                              (save-restriction
+                                (widen)
+                                (backward-up-list) (backward-up-list)
+                                (prog1
+                                    (re-search-forward field-re nil t)
+                                  (setq res (match-string 1)))))
+                         res))))
                     (set-field
                      (field value)
                      (goto-char (point-min))
@@ -193,6 +205,30 @@
                           (list
                            (cons 'date
                                  (format-time-string "%Y-%m-%dT%H:%M:%S%z"))
+                           (cons 'sha256
+                                 (buffer-substring
+                                  (line-beginning-position)
+                                  (line-end-position)))))))
+                     (`"fetchPypi"
+                      (let ((pname (get-field "pname"))
+                            (version (get-field "version")))
+                        (message "version: %s" version)
+                        (with-temp-buffer
+                          (message "Fetching PyPi Package: %s-%s: ..." pname version)
+                          (let ((inhibit-redisplay t))
+                            (shell-command
+                             (format
+                              "nix-prefetch-url mirror://pypi/%s/%s/%s-%s.tar.gz"
+                              (substring pname 0 1)
+                              pname
+                              pname
+                              version)
+                             (current-buffer))
+                            (message "Fetching PyPi Package: %s-%s: ...done" pname version))
+                          (goto-char (point-min))
+                          (while (looking-at "^\\(path is\\|warning\\)")
+                            (forward-line))
+                          (list
                            (cons 'sha256
                                  (buffer-substring
                                   (line-beginning-position)
