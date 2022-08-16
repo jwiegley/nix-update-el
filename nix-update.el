@@ -36,9 +36,9 @@
 (require 'json)
 
 ;;;###autoload
-(defun nix-update-fetch ()
+(defun nix-update-fetch (&optional arg)
   "Update the nix fetch expression at point."
-  (interactive)
+  (interactive "P")
   (save-excursion
     (when (re-search-forward
            (rx (and (submatch
@@ -97,7 +97,7 @@
                      (`"fetchFromGitHub"
                       (let ((owner (get-field "owner"))
                             (repo (get-field "repo"))
-                            (rev (or (get-field "rev") ""))
+                            (rev (or (and (null arg) (get-field "rev")) ""))
                             (submodules
                              (let ((subs (get-field "fetchSubmodules")))
                                (and subs (string-equal subs "true")))))
@@ -121,7 +121,7 @@
                      (`"fetchFromGitLab"
                       (let ((owner (get-field "owner"))
                             (repo (get-field "repo"))
-                            (rev (or (get-field "rev") "")))
+                            (rev (or (and (null arg) (get-field "rev")) "")))
                         (with-temp-buffer
                           (message "Fetching GitLab repository: %s/%s ..."
                                    owner repo)
@@ -140,7 +140,7 @@
                           (json-read-object))))
                      (`"fetchgit"
                       (let ((url (get-field "url"))
-                            (rev (or (get-field "rev") "")))
+                            (rev (or (and (null arg) (get-field "rev")) "")))
                         (with-temp-buffer
                           (message "Fetching Git URL: %s ..." url)
                           (let ((inhibit-redisplay t))
