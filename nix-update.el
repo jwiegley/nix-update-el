@@ -235,7 +235,12 @@
                                   (line-end-position))))))))))
               (if (assq 'rev data)
                   (set-field "rev" (alist-get 'rev data)))
-              (set-field "sha256" (alist-get 'sha256 data))
+              (if (get-field "hash")
+                  (set-field "hash" (or (alist-get 'hash data)
+                                        (string-trim
+                                         (shell-command-to-string
+                                          (concat "nix hash convert --hash-algo sha256 --to sri " (alist-get 'sha256 data))))))
+                (set-field "sha256" (alist-get 'sha256 data)))
               (if (assq 'date data)
                   (set-field "# date"
                              (let ((date (alist-get 'date data)))
