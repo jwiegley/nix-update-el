@@ -61,7 +61,7 @@
           (cl-flet ((get-field
                       (field)
                       (goto-char (point-min))
-                      (let ((field-re (concat field "\\s-+=\\s-+\"?\\(.+?\\)\"?\\s-*;"))
+                      (let ((field-re (concat field "\\s-+=\\s-+\"?\\(.*?\\)\"?\\s-*;"))
                             (res))
                         (cond
                          ((re-search-forward field-re nil t)
@@ -81,7 +81,7 @@
                       (field value)
                       (goto-char (point-min))
                       (if (re-search-forward
-                           (concat field "\\s-+=\\s-+\"?\\(.+?\\)\"?\\s-*;")
+                           (concat field "\\s-+=\\s-+\"?\\(.*?\\)\"?\\s-*;")
                            nil t)
                           (replace-match value nil t nil 1)
                         (goto-char (point-max))
