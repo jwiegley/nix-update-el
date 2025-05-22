@@ -138,7 +138,7 @@
                              owner repo))
                           (goto-char (point-min))
                           (json-read-object))))
-                     (`"fetchgit"
+                     ((or `"fetchgit" `"fetchGit")
                       (let ((url (get-field "url"))
                             (rev (or (and (null arg) (get-field "rev")) "")))
                         (with-temp-buffer
